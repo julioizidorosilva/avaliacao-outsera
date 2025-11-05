@@ -1,0 +1,14 @@
+/Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/dto/ProducerInterval.java
+/Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/controller/MovieController.java
+/Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/model/Movie.java
+/Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/dto/MovieResponse.java
+/Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/config/OpenApiConfig.java
+/Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/config/DataInitializer.java
+/Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/AvaliacaoApplication.java
+/Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/controller/ApiResourceController.java
+/Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/repository/MovieRepository.java
+/Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/dto/ProducerIntervalResponse.java
+/Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/service/MovieService.java
+/Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/mapper/MovieMapper.java
+/Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/controller/GlobalExceptionHandler.java
+/Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/logging/RequestIdFilter.java
