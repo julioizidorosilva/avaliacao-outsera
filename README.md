@@ -41,7 +41,6 @@ Implementa o **Nível 2 de Maturidade de Richardson** com recursos bem definidos
 |------------|--------|-----------|
 | **Maven** | 3.11.0 | Gerenciamento de dependências |
 | **Lombok** | 1.18.26 | Redução de boilerplate |
-| **MapStruct** | 1.5.5 | Mapeamento entre DTOs e entidades |
 
 ### Observabilidade & Logs
 | Tecnologia | Versão | Descrição |
@@ -183,8 +182,6 @@ src/
 │   │   ├── dto/
 │   │   │   ├── MovieResponse.java           # DTOs de resposta
 │   │   │   └── ProducerIntervalResponse.java
-│   │   ├── mapper/
-│   │   │   └── MovieMapper.java             # MapStruct mappers
 │   │   └── logging/
 │   │       └── RequestIdFilter.java         # Correlação de logs
 │   └── resources/
@@ -400,7 +397,6 @@ mvn spring-boot:run -Dapp.load-on-startup=true
 | Problema | Solução |
 |----------|---------|
 | **Porta 8080 ocupada** | Altere `server.port` em `application.properties` |
-| **Erro de compilação MapStruct** | Execute `mvn clean compile` |
 | **Testes falhando** | Verifique se não há aplicação rodando na porta 8080 |
 | **JAR não executa** | Verifique Java 17+ com `java -version` |
 

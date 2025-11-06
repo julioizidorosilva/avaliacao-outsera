@@ -66,13 +66,6 @@
       <version>7.4</version>
     </dependency>
 
-    <!-- MapStruct for compile-time bean mapping -->
-    <dependency>
-      <groupId>org.mapstruct</groupId>
-      <artifactId>mapstruct</artifactId>
-      <version>1.5.5.Final</version>
-    </dependency>
-
     <!-- SpringDoc OpenAPI 3 for interactive API documentation -->
     <dependency>
       <groupId>org.springdoc</groupId>
@@ -94,16 +87,7 @@
               <artifactId>lombok</artifactId>
               <version>1.18.26</version>
             </path>
-            <path>
-              <groupId>org.mapstruct</groupId>
-              <artifactId>mapstruct-processor</artifactId>
-              <version>1.5.5.Final</version>
-            </path>
           </annotationProcessorPaths>
-          <compilerArgs>
-            <!-- Default to Spring component model for generated mappers -->
-            <arg>-Amapstruct.defaultComponentModel=spring</arg>
-          </compilerArgs>
         </configuration>
       </plugin>
       <plugin>
