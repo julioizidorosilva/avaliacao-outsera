@@ -294,12 +294,6 @@ curl http://localhost:8080/api/movies/producers/intervals
 mvn test -Dtest=CsvValidationTest
 ```
 
-### **Script Automático (Recomendado)**
-```bash
-# Verifica aplicação e executa teste automaticamente
-./test-production.sh
-```
-
 ### **Comando com Logs Detalhados**
 ```bash
 mvn test -Dtest=CsvValidationTest -X
