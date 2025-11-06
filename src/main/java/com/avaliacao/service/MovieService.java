@@ -15,7 +15,7 @@ import java.io.InputStreamReader;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.stream.Collectors;
+
  
 
 @Service
@@ -164,39 +164,43 @@ public class MovieService {
             }
         }
         
-        List<ProducerInterval> intervals = new ArrayList<>();
+        List<ProducerInterval> minIntervals = new ArrayList<>();
+        List<ProducerInterval> maxIntervals = new ArrayList<>();
+        int minInterval = Integer.MAX_VALUE;
+        int maxInterval = Integer.MIN_VALUE;
         
         for (Map.Entry<String, List<Integer>> entry : producerWins.entrySet()) {
             String producer = entry.getKey();
             List<Integer> years = entry.getValue();
             
-            years = years.stream().distinct().sorted().collect(Collectors.toList());
+            if (years.size() <= 1) continue;
             
-            if (years.size() > 1) {
-                for (int i = 1; i < years.size(); i++) {
-                    int previousWin = years.get(i - 1);
-                    int followingWin = years.get(i);
-                    int interval = followingWin - previousWin;
-                    
-                    intervals.add(new ProducerInterval(producer, interval, previousWin, followingWin));
+            years.sort(Integer::compareTo);
+            
+            for (int i = 1; i < years.size(); i++) {
+                int previousWin = years.get(i - 1);
+                int followingWin = years.get(i);
+                int interval = followingWin - previousWin;
+                
+                ProducerInterval producerInterval = new ProducerInterval(producer, interval, previousWin, followingWin);
+                
+                if (interval < minInterval) {
+                    minInterval = interval;
+                    minIntervals.clear();
+                    minIntervals.add(producerInterval);
+                } else if (interval == minInterval) {
+                    minIntervals.add(producerInterval);
+                }
+                
+                if (interval > maxInterval) {
+                    maxInterval = interval;
+                    maxIntervals.clear();
+                    maxIntervals.add(producerInterval);
+                } else if (interval == maxInterval) {
+                    maxIntervals.add(producerInterval);
                 }
             }
         }
-        
-        if (intervals.isEmpty()) {
-            return new ProducerIntervalResponse(new ArrayList<>(), new ArrayList<>());
-        }
-        
-        int minInterval = intervals.stream().mapToInt(ProducerInterval::getInterval).min().orElse(0);
-        int maxInterval = intervals.stream().mapToInt(ProducerInterval::getInterval).max().orElse(0);
-        
-        List<ProducerInterval> minIntervals = intervals.stream()
-                .filter(interval -> interval.getInterval().equals(minInterval))
-                .collect(Collectors.toList());
-        
-        List<ProducerInterval> maxIntervals = intervals.stream()
-                .filter(interval -> interval.getInterval().equals(maxInterval))
-                .collect(Collectors.toList());
         
         return new ProducerIntervalResponse(minIntervals, maxIntervals);
     }

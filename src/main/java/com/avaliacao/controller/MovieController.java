@@ -25,7 +25,6 @@ import java.util.Optional;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Tag(name = "Filmes", description = "Operações relacionadas aos filmes do Golden Raspberry Awards")
 @RestController
 @RequestMapping("/api/movies")
@@ -82,7 +81,7 @@ public class MovieController {
         }
     }
 
-   
+    
     @Operation(summary = "Obter intervalos de prêmios dos produtores", 
                description = "Retorna os intervalos mínimo e máximo entre dois prêmios consecutivos dos produtores. " +
                            "Inclui o produtor com menor intervalo e o produtor com maior intervalo entre prêmios consecutivos.")
@@ -137,7 +136,7 @@ public class MovieController {
         }
     }
 
-   
+  
     @Data
     @NoArgsConstructor
     public static class ErrorResponse {

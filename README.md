@@ -76,6 +76,7 @@ mvn -version     # Maven 3.6+
 git clone https://github.com/julioizidorosilva/avaliacao-outsera.git
 cd avaliacao-outsera
 mvn clean compile
+```
 
 ### Executar Aplicação
 ```bash
@@ -117,13 +118,6 @@ Especificação YAML: http://localhost:8080/v3/api-docs.yaml
 - **Parâmetros** - Descrição detalhada de cada parâmetro
 - **Autenticação** - Documentação de segurança (quando aplicável)
 
-### Screenshots
-```bash
-# Verificar se a documentação está ativa
-curl -s http://localhost:8080/v3/api-docs | jq '.info.title'
-# Output: "Golden Raspberry Awards API"
-```
-
 ## API Endpoints
 
 ### **Descoberta & Monitoramento**
@@ -134,7 +128,7 @@ curl -s http://localhost:8080/v3/api-docs | jq '.info.title'
 | `GET` | `/api/status-codes` | Documentação dos códigos HTTP |
 | `OPTIONS` | `/api` | Verificação CORS |
 
-### 🎬 **Gestão de Filmes**
+### **Gestão de Filmes**
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
 | `GET` | `/api/movies` | Lista todos os filmes |
@@ -168,28 +162,6 @@ curl -s http://localhost:8080/v3/api-docs | jq '.info.title'
 }
 ```
 </details>
-
-## Executando Testes
-
-### Testes Rápidos
-```bash
-# Todos os testes
-mvn test
-
-# Apenas testes de integração
-mvn test -Dtest="*IntegrationTest"
-
-# Teste específico
-mvn test -Dtest="MovieControllerIntegrationTest"
-```
-
-### Testes com Debug
-```bash
-# Com stacktrace completo
-mvn test -DtrimStackTrace=false
-
-# Teste específico com debug
-mvn test -Dtest="MovieControllerIntegrationTest#listAllMovies_andFavicon"
 
 ## Estrutura do Projeto
 
@@ -245,6 +217,165 @@ postman_collection/
 3. **Selecionar Environment** → "Avaliacao API - Local"
 4. **Executar testes** na ordem sugerida
 
+## Testes de Integração
+
+### Execução de Testes
+
+#### Testes Básicos (Ignora Aplicação Externa)
+```bash
+# Executa testes de unidade e integração básicos
+# IGNORA automaticamente o teste que precisa da aplicação rodando
+mvn test
+```
+
+#### Teste de Validação Completa (Inclui Aplicação Externa)
+```bash
+# Terminal 1: Rodar aplicação
+mvn spring-boot:run
+
+# Terminal 2: Executar teste específico
+mvn test -Dtest=CsvValidationTest -Drun.integration.tests=true
+
+# OU executar todos os testes incluindo validação externa
+mvn test -Drun.integration.tests=true
+```
+
+### Fluxo de Validação
+1. **Verifica aplicação externa**: `http://localhost:8080`
+2. **Lê CSV local**: `movielist.csv` do classpath
+3. **Calcula intervalos esperados**: Baseado nos dados do CSV
+4. **Consulta API externa**: Endpoint da aplicação rodando
+5. **Compara resultados**: CSV vs API externa
+6. **Detecta inconsistências**: Falha se houver diferenças
+
+### Validações Principais
+- **SEM carregamento H2**: Teste não carrega dados no banco
+- **Leitura Real do CSV**: Lê `movielist.csv` localmente
+- **Cálculo de Intervalos**: Implementa a mesma lógica do requisito
+- **Requisição HTTP Externa**: Para aplicação rodando em localhost:8080
+- **Normalização de Tipos**: Converte Number para int para comparação
+- **Comparação de Conjuntos**: Ignora ordem usando HashSet
+- **Detecção de Inconsistências**: Falha automaticamente em diferenças
+
+## CENÁRIOS DE TESTE COBERTOS
+
+### **CENÁRIO 1: SUCESSO - Dados Consistentes**
+```
+Estado: CSV = API (dados sincronizados)
+Resultado: Teste PASSA
+Saída: "DADOS CONSISTENTES!"
+```
+
+**Como Reproduzir:**
+1. Iniciar aplicação: `mvn spring-boot:run`
+2. Aguardar carregamento completo dos dados
+## PRÉ-REQUISITOS
+
+### **CRÍTICO: Aplicação deve estar rodando**
+```bash
+# Terminal 1: Subir aplicação em produção
+mvn spring-boot:run
+# Aguardar: "Started AvaliacaoApplication in X.XX seconds"
+```
+
+### **Verificar conectividade**
+```bash
+# Testar se aplicação está respondendo
+curl http://localhost:8080/api/movies/producers/intervals
+
+# Resposta esperada: JSON com intervalos min/max
+```
+
+## COMANDOS DE EXECUÇÃO
+
+### **Comando Principal**
+```bash
+# IMPORTANTE: Execute APÓS aplicação estar rodando
+mvn test -Dtest=CsvValidationTest
+```
+
+### **Script Automático (Recomendado)**
+```bash
+# Verifica aplicação e executa teste automaticamente
+./test-production.sh
+```
+
+### **Comando com Logs Detalhados**
+```bash
+mvn test -Dtest=CsvValidationTest -X
+```
+
+## CENÁRIOS DE TESTE
+
+### **CENÁRIO 1: SUCESSO - Dados Consistentes**
+```
+Estado: CSV local = Aplicação em rodando (dados sincronizados)
+Resultado: Teste PASSA
+Saída: "Todos os intervalos correspondem entre CSV e API!"
+```
+
+**Como Reproduzir:**
+1. Subir aplicação: `mvn spring-boot:run` (Terminal 1)
+2. Executar teste: `mvn test -Dtest=CsvValidationTest` (Terminal 2)
+3. **Resultado Esperado**: Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+---
+
+### **CENÁRIO 2: FALHA - CSV tem dados extras**
+```
+Estado: CSV modificado com linhas adicionais (ex: 2025)
+Aplicação: Dados originais sem as novas linhas
+Resultado: Teste FALHA
+Saída: AssertionError mostrando diferenças específicas
+```
+
+**Como Reproduzir:**
+1. Aplicação rodando com dados originais
+2. Adicionar linha ao CSV: `2025;Road House2;United Artists2;Joel Silver;yes`
+3. Executar teste: `mvn test -Dtest=CsvValidationTest`
+4. **Resultado Esperado**: TESTE FALHA com detalhes das diferenças
+5. **Inconsistência Detectada**: 
+   ```
+   expected: [{"followingWin"=2025, "interval"=34, "producer"="Joel Silver"}]
+   but was: [{"followingWin"=2015, "interval"=13, "producer"="Matthew Vaughn"}]
+   ```
+
+---
+
+### **CENÁRIO 3: FALHA - Aplicação tem dados extras**
+```
+Estado: CSV com dados removidos/alterados
+Aplicação: Dados completos originais
+Resultado: Teste FALHA
+Saída: AssertionError mostrando dados faltantes no CSV
+```
+
+**Como Reproduzir:**
+1. Aplicação rodando com dados completos
+2. Remover linhas do CSV local
+3. Executar teste: `mvn test -Dtest=CsvValidationTest`
+4. **Resultado Esperado**: TESTE FALHA detectando dados faltantes
+
+---
+
+### **CENÁRIO 4: FALHA - Aplicação não está rodando**
+```
+Estado: Aplicação não iniciada ou inacessível
+Resultado: Teste FALHA imediatamente
+Saída: Erro de conectividade com instruções claras
+```
+
+**Como Reproduzir:**
+1. NÃO iniciar aplicação (ou parar se estiver rodando)
+2. Executar teste: `mvn test -Dtest=CsvValidationTest`
+3. **Resultado Esperado**: 
+   ```
+   FALHA: Aplicação em produção não está acessível!
+      Execute: mvn spring-boot:run em outro terminal
+      Aguarde a mensagem 'Started AvaliacaoApplication'
+      Então execute este teste novamente
+
+
 ## Configuração & Customização
 
 ### Variáveis de Ambiente
@@ -286,38 +417,6 @@ mvn spring-boot:run -Dlogging.level.com.avaliacao=DEBUG
 
 # Ver SQL queries
 mvn spring-boot:run -Dlogging.level.org.hibernate.SQL=DEBUG
-```
-
-## Recursos Implementados 
-
-### Documentação Swagger/OpenAPI
-A aplicação agora possui documentação interativa completa:
-
-- **Swagger UI**: Interface visual acessível em `/swagger-ui.html`
-- **Especificação OpenAPI 3.0**: Disponível em `/v3/api-docs` (JSON) e `/v3/api-docs.yaml` (YAML)
-- **Anotações Completas**: Todos os controllers possuem anotações `@Operation`, `@ApiResponses` e `@Parameter`
-- **Esquemas DTOs**: Documentação automática de todos os modelos de dados
-- **Testes Interativos**: Execute chamadas diretamente na interface Swagger
-- **Metadados API**: Informações sobre contato, licença e versão
-
-### Configuração Implementada
-- **SpringDoc OpenAPI 2.2.0**: Biblioteca para geração automática da documentação
-- **OpenApiConfig.java**: Configuração centralizada com informações da API
-- **Tags por Controller**: Organização lógica dos endpoints
-- **Responses HTTP**: Documentação completa dos códigos de status
-- **Content Types**: Especificação precisa dos tipos de mídia aceitos
-
-### Como Testar a Documentação
-```bash
-# 1. Iniciar aplicação
-mvn spring-boot:run
-
-# 2. Acessar Swagger UI
-open http://localhost:8080/swagger-ui.html
-
-# 3. Verificar especificação OpenAPI
-curl http://localhost:8080/v3/api-docs | jq '.info.title'
-# Output: "Golden Raspberry Awards API"
 ```
 
 
