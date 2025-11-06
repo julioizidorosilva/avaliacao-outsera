@@ -9,6 +9,5 @@
 /Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/repository/MovieRepository.java
 /Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/dto/ProducerIntervalResponse.java
 /Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/service/MovieService.java
-/Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/mapper/MovieMapper.java
 /Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/controller/GlobalExceptionHandler.java
 /Users/julioizidoro/Git/avaliacao-outsera/src/main/java/com/avaliacao/logging/RequestIdFilter.java

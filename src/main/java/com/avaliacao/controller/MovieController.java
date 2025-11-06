@@ -2,7 +2,6 @@ package com.avaliacao.controller;
 
 import com.avaliacao.model.Movie;
 import com.avaliacao.dto.MovieResponse;
-import com.avaliacao.mapper.MovieMapper;
 import com.avaliacao.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,8 +32,6 @@ public class MovieController {
 
     @Autowired
     private MovieService movieService;
-    @Autowired
-    private MovieMapper movieMapper;
 
     @Operation(summary = "Listar todos os filmes", 
                description = "Retorna uma lista completa de todos os filmes cadastrados, ordenados por ano")
@@ -48,7 +45,7 @@ public class MovieController {
     public ResponseEntity<List<MovieResponse>> listarTodos() {
         try {
             List<Movie> movies = movieService.listarTodos();
-            List<MovieResponse> resp = movies.stream().map(movieMapper::toDto).collect(java.util.stream.Collectors.toList());
+            List<MovieResponse> resp = movies.stream().map(MovieResponse::new).collect(java.util.stream.Collectors.toList());
             return ResponseEntity.ok(resp);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -72,7 +69,7 @@ public class MovieController {
             Optional<Movie> movie = movieService.buscarPorId(id);
             
             if (movie.isPresent()) {
-                return ResponseEntity.ok(movieMapper.toDto(movie.get()));
+                return ResponseEntity.ok(new MovieResponse(movie.get()));
             } else {
                 return ResponseEntity.notFound().build();
             }
